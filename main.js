@@ -1,0 +1,1 @@
+(()=>{let e=[];document.querySelector("#submit-add").onclick=()=>{var o,t;o=document.querySelector("#task").value,t=document.querySelector("#date").value,e.push({todo:o,due:t,isDone:!1}),console.log(e)}})();

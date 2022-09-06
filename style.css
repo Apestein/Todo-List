@@ -1,0 +1,25 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    outline: 1px solid green; 
+}
+body {
+    background-color: black;
+    color: white;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+main {
+    flex: 1;
+    display: flex;
+}
+nav {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+}
+.display {
+    
+}
