@@ -25,7 +25,5 @@ nav {
 }
 .popup-task, .popup-project {
     display: none;
-}
-input::placeholder {
-    color: black;
+
 }
