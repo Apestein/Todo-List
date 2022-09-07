@@ -18,18 +18,20 @@
             <button id="today">Today</button>
             <button id="this-week">This Week</button>
             <button id="add-project">+Projects</button>
-            <div class="pop-up">
-                <input type="text" placeholder="new project">
+            <div class="project-list"></div>
+            <div class="popup-project">
+                <input type="text" placeholder="new project" id="project">
                 <div class="popup-btn">
-                    <button>+Add</button>
-                    <button>Cancel</button>
+                    <button id="submit-project">+Add</button>
+                    <button id="cancel-project">Cancel</button>
                 </div>
             </div>
         </nav>
         <div class="display">
             <h2>Home</h2>
+            <div class="todo-list"></div>
             <button id="add-task">+Add Task</button>
-            <div class="pop-up">
+            <div class="popup-task">
                 <input type="text" placeholder="task" id="task">
                 <input type="date" id="date">
                 <div class="popup-btn">
