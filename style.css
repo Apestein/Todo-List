@@ -20,6 +20,12 @@ nav {
     flex-direction: column;
     width: 25%;
 }
-.display {
-    
+.todo-item {
+    display: flex;
+}
+.popup-task, .popup-project {
+    display: none;
+}
+input::placeholder {
+    color: black;
 }
