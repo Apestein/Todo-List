@@ -1,3 +1,5 @@
+import { compareAsc, format } from 'date-fns'
+
 let projects = [
     {name: 'defaultProject', toDo: []}
 ]
@@ -18,6 +20,7 @@ const projectName = document.querySelector('#project-name')
 
 homeBtn.onclick = () => {
     projectName.textContent = 'Home'
+    currentProject = projects[0]
     displayAllTasks()
 } 
 
@@ -71,6 +74,11 @@ function addTodo(task, due) {
 }
 
 function displayTasks() {
+    currentProject.toDo.sort((a, b) => {
+        if (a.due > b.due) return 1
+        else if (a.due < b.due) return -1
+        else return 0 
+    })
     for (let i = 0; i < currentProject.toDo.length; i++) {
         let e = currentProject.toDo[i]
         const div = document.createElement('div')
@@ -130,7 +138,6 @@ function displayProjects() {
             projectName.textContent = currentProject.name
             todoList.innerHTML = ''
             displayTasks()
-            console.log(currentProject)
         }
         div.appendChild(button)
         div.appendChild(delBtn)
@@ -140,8 +147,7 @@ function displayProjects() {
 
 function displayAllTasks() {
     todoList.innerHTML = ''
-    for (element of projects) {
-        currentProject = element
-        displayTasks()
-    } 
+    for (let project of projects) projects[0].toDo.push(...project.toDo);
+    if (projects[0].toDo.length) displayTasks()
+    console.log(projects[0].toDo)
 }
