@@ -1,11 +1,14 @@
-import { compareAsc, format } from 'date-fns'
+import { compareAsc, format, isSameDay, isSameWeek } from 'date-fns'
 
 let projects = [
-    {name: 'defaultProject', toDo: []}
+    {name: 'home', toDo: []},
+    {name: 'today', toDo: []},
+    {name: 'week', toDo: []},
 ]
 let currentProject = projects[0]
 
 const homeBtn = document.querySelector('#home')
+const todayBtn = document.querySelector('#today')
 const addTask = document.querySelector('#add-task')
 const addProject = document.querySelector('#add-project')
 const cancelProject = document.querySelector('#cancel-project')
@@ -19,10 +22,29 @@ const popupProject = document.querySelector('.popup-project')
 const projectName = document.querySelector('#project-name')
 
 homeBtn.onclick = () => {
+    addTask.disabled = false
     projectName.textContent = 'Home'
     currentProject = projects[0]
-    displayAllTasks()
-} 
+    todoList.innerHTML = ''
+    displayTasks()
+}
+
+todayBtn.onclick = () => {
+    addTask.disabled = true
+    projectName.textContent = 'Today'
+    currentProject = projects[1]
+    currentProject.toDo = []
+    for (let project of projects) {
+        if (project.name === currentProject.name) continue;
+        for (let todo of project.toDo) {
+            if (isSameDay(new Date(`${todo.due}T12:00`), new Date())) {
+                currentProject.toDo.push(todo)
+            }
+        }
+    }
+    todoList.innerHTML = ''
+    displayTasks()
+}
 
 addProject.onclick = () => {
     popupProject.style.display = 'block'
@@ -53,6 +75,7 @@ submitBtn.onclick = () => {
     displayTasks()
     addTask.style.display = 'block'
     popupTask.style.display = 'none'
+    console.log(currentProject.toDo)
 }
 
 submitProjectBtn.onclick = () => {
@@ -60,17 +83,22 @@ submitProjectBtn.onclick = () => {
     document.querySelector('#project').value = ''
     if(!newProject) return;
     projectList.innerHTML = ''
-    createProject(newProject)
+    if (createProject(newProject)) alert('Project already exist')
     displayProjects()
     popupProject.style.display = 'none'
 }
 
 function createProject(name) {
+    for (let project of projects) {
+        if (project.name === name) return true
+    }
     projects.push({name, toDo: []})
 }
 
 function addTodo(task, due) {
+    if (isUnique(task)) return;
     currentProject.toDo.push({task, due, isDone: false})
+    if (currentProject !== projects[0]) projects[0].toDo.push({task, due, isDone: false})
 }
 
 function displayTasks() {
@@ -90,8 +118,7 @@ function displayTasks() {
             if (checkbox.checked) {
                 div.style = 'text-decoration: line-through'
                 e.isDone = true
-            } 
-            else {
+            } else {
                 div.style = 'text-decoration: none'
                 e.isDone = false
             } 
@@ -107,7 +134,10 @@ function displayTasks() {
         delBtn.setAttribute('data', i)
         delBtn.textContent = 'Delete'
         delBtn.onclick = () => {
-            currentProject.toDo.splice(delBtn.getAttribute('data'), 1)
+            for (let project of projects) {
+                let index = project.toDo.findIndex(e => e.task === input.value)
+                if (index !== -1) project.toDo.splice(index, 1)
+            }
             div.remove()
         }
         if (e.isDone) div.classList.add('done')
@@ -121,7 +151,7 @@ function displayTasks() {
 
 function displayProjects() {
     for (let i = 0; i < projects.length; i++) {
-        if (i == 0) continue;
+        if (i <= 2) continue;
         const div = document.createElement('div')
         const button = document.createElement('button')
         const delBtn = document.createElement('button')
@@ -134,6 +164,7 @@ function displayProjects() {
         delBtn.setAttribute('id', 'delete-project')
         button.textContent = projects[i].name
         button.onclick = () => {
+            addTask.disabled = false
             currentProject = projects[i]
             projectName.textContent = currentProject.name
             todoList.innerHTML = ''
@@ -145,9 +176,14 @@ function displayProjects() {
     }
 }
 
-function displayAllTasks() {
-    todoList.innerHTML = ''
-    for (let project of projects) projects[0].toDo.push(...project.toDo);
-    if (projects[0].toDo.length) displayTasks()
-    console.log(projects[0].toDo)
-}
+function isUnique(task) {
+    for (let project of projects) {
+        for (let todo of project.toDo) {
+            if (task === todo.task) {
+                alert('Task Already Exist')
+                return true;
+            }
+        }
+    }
+} 
+
