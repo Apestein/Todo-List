@@ -1,14 +1,7 @@
-/* import {isSameDay, isSameWeek} from 'date-fns' */
-import {displayTasks, displayProjects} from './ui'
+import {projects, currentProject, setCurrentProject, createProject, addTodo, populateStorage} from './index'
+import {isSameDay, isSameWeek} from 'date-fns'
 
-let projects = [
-    {name: 'home', toDo: []},
-    {name: 'today', toDo: []},
-    {name: 'week', toDo: []},
-]
-let currentProject = projects[0]
-
-/* const homeBtn = document.querySelector('#home')
+const homeBtn = document.querySelector('#home')
 const todayBtn = document.querySelector('#today')
 const thisWeekBtn = document.querySelector('#this-week')
 const addTask = document.querySelector('#add-task')
@@ -26,7 +19,7 @@ const projectName = document.querySelector('#project-name')
 homeBtn.onclick = () => {
     addTask.disabled = false
     projectName.textContent = 'Home'
-    currentProject = projects[0]
+    setCurrentProject(projects[0])
     todoList.innerHTML = ''
     displayTasks()
 }
@@ -34,8 +27,7 @@ homeBtn.onclick = () => {
 todayBtn.onclick = () => {
     addTask.disabled = true
     projectName.textContent = 'Today'
-    currentProject = projects[1]
-    currentProject.toDo = []
+    setCurrentProject(projects[1])
     for (let project of projects) {
         if (project.name === currentProject.name) continue;
         for (let todo of project.toDo) {
@@ -52,8 +44,7 @@ todayBtn.onclick = () => {
 thisWeekBtn.onclick = () => {
     addTask.disabled = true
     projectName.textContent = 'This Week'
-    currentProject = projects[2]
-    currentProject.toDo = []
+    setCurrentProject(projects[2])
     for (let project of projects) {
         if (project.name === currentProject.name) continue;
         for (let todo of project.toDo) {
@@ -175,7 +166,7 @@ function displayProjects() {
         button.textContent = projects[i].name
         button.onclick = () => {
             addTask.disabled = false
-            currentProject = projects[i]
+            setCurrentProject(projects[i])
             projectName.textContent = currentProject.name
             todoList.innerHTML = ''
             displayTasks()
@@ -184,50 +175,6 @@ function displayProjects() {
         div.appendChild(delBtn)
         projectList.appendChild(div)
     }
-} */
-
-function isUnique(task) {
-    for (let project of projects) {
-        for (let todo of project.toDo) {
-            if (task === todo.task) {
-                alert('Task Already Exist')
-                return true;
-            }
-        }
-    }
-} 
-
-function createProject(name) {
-    for (let project of projects) {
-        if (project.name === name) return true
-    }
-    projects.push({name, toDo: []})
-    populateStorage()
 }
 
-function addTodo(task, due) {
-    if (isUnique(task)) return;
-    currentProject.toDo.push({task, due, isDone: false})
-    if (currentProject !== projects[0]) projects[0].toDo.push({task, due, isDone: false})
-    populateStorage()
-}
-
-function populateStorage() {
-    localStorage.setItem('projects', JSON.stringify(projects))
-}
-
-function readLocalStorage() {
-    const storageProjects = localStorage.getItem('projects')
-    if (storageProjects) projects = JSON.parse(storageProjects)
-    currentProject = projects[0]
-}
-
-function setCurrentProject(project) {
-    currentProject = project
-}
-
-readLocalStorage()
-displayTasks()
-displayProjects()
-
-export {projects, currentProject, setCurrentProject, createProject, addTodo, populateStorage}
+export {displayTasks, displayProjects}
