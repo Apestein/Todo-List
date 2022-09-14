@@ -15,6 +15,9 @@ main {
     flex: 1;
     display: flex;
 }
+.done {
+    text-decoration: line-through;
+}
 nav {
     display: flex;
     flex-direction: column;

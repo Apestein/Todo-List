@@ -1,6 +1,8 @@
 import {projects, currentProject, setCurrentProject, createProject, addTodo, populateStorage} from './index'
 import {isSameDay, isSameWeek} from 'date-fns'
 
+export {displayTasks, displayProjects}
+
 const homeBtn = document.querySelector('#home')
 const todayBtn = document.querySelector('#today')
 const thisWeekBtn = document.querySelector('#this-week')
@@ -28,13 +30,10 @@ todayBtn.onclick = () => {
     addTask.disabled = true
     projectName.textContent = 'Today'
     setCurrentProject(projects[1])
-    for (let project of projects) {
-        if (project.name === currentProject.name) continue;
-        for (let todo of project.toDo) {
-            if (isSameDay(new Date(`${todo.due}T12:00`), new Date())) {
-                if (currentProject.toDo.find(e => e.task === todo.task)) continue;
-                currentProject.toDo.push(todo)
-            }
+    currentProject.toDo = []
+    for (let todo of projects[0].toDo) {
+        if (isSameDay(new Date(`${todo.due}T12:00`), new Date())) {
+            currentProject.toDo.push(todo)
         }
     }
     todoList.innerHTML = ''
@@ -45,13 +44,10 @@ thisWeekBtn.onclick = () => {
     addTask.disabled = true
     projectName.textContent = 'This Week'
     setCurrentProject(projects[2])
-    for (let project of projects) {
-        if (project.name === currentProject.name) continue;
-        for (let todo of project.toDo) {
-            if (isSameWeek(new Date(`${todo.due}T12:00`), new Date())) {
-                if (currentProject.toDo.find(e => e.task === todo.task)) continue;
-                currentProject.toDo.push(todo)
-            }
+    currentProject.toDo = []
+    for (let todo of projects[0].toDo) {
+        if (isSameWeek(new Date(`${todo.due}T12:00`), new Date())) {
+            currentProject.toDo.push(todo)
         }
     }
     todoList.innerHTML = ''
@@ -110,25 +106,44 @@ function displayTasks() {
         let e = currentProject.toDo[i]
         const div = document.createElement('div')
         div.classList.add('todo-item')
+        const input = document.createElement('input')
+        input.value = e.task
+        input.onchange = () => {
+            if (!input.value) input.value = e.task
+            let temp = e.task
+            for (let project of projects) {
+                for (let todo of project.toDo) {
+                    if (temp === todo.task) {
+                        todo.task = input.value
+                    }
+                }
+            }
+            populateStorage()
+        } 
         const checkbox = document.createElement('input')
         checkbox.type = 'checkbox'
-        checkbox.setAttribute('id', 'is-done')
         checkbox.onclick = () => {
             if (checkbox.checked) {
-                div.style = 'text-decoration: line-through'
+                input.classList.toggle('done')
                 e.isDone = true
             } else {
-                div.style = 'text-decoration: none'
+                input.classList.toggle('done')
                 e.isDone = false
             } 
         }
-        const input = document.createElement('input')
-        input.value = e.task
-        input.onchange = () => e.task = input.value
         const input2 = document.createElement('input')
         input2.type = 'date'
         input2.value = e.due
-        input2.onchange = () => e.due = input2.value
+        input2.onchange = () => {
+            for (let project of projects) {
+                for (let todo of project.toDo) {
+                    if (e.task === todo.task) {
+                        todo.due = input2.value
+                    }
+                }
+            }
+            populateStorage()
+        } 
         const delBtn = document.createElement('button')
         delBtn.setAttribute('data', i)
         delBtn.textContent = 'Delete'
@@ -140,13 +155,18 @@ function displayTasks() {
             div.remove()
             populateStorage()
         }
-        if (e.isDone) div.classList.add('done')
+        if (e.isDone) {
+            input.classList.add('done')
+            checkbox.checked = true
+        } 
         div.appendChild(checkbox)
         div.appendChild(input) 
         div.appendChild(input2)
         div.appendChild(delBtn)
         todoList.appendChild(div)
     }
+    populateStorage()
+    console.log(projects)
 }
 
 function displayProjects() {
@@ -155,11 +175,24 @@ function displayProjects() {
         const div = document.createElement('div')
         const button = document.createElement('button')
         const delBtn = document.createElement('button')
-        delBtn.setAttribute('data', i)
         delBtn.textContent = 'Delete'
         delBtn.onclick = () => {
-            projects.splice(delBtn.getAttribute('data'), 1)
+            let index = projects.findIndex(e => e.name === button.textContent)
+            setCurrentProject(projects[index])
+            for (let curTodo of currentProject.toDo) {
+                let index = projects[0].toDo.findIndex(e => e.task === curTodo.task)
+                if (index !== -1) projects[0].toDo.splice(index, 1)
+            }
+            for (let i = 0; i < projects.length; i++) {
+                if (projects[i].name === button.textContent) {
+                    projects.splice(i, 1)
+                } 
+            }
             div.remove()
+            setCurrentProject(projects[0])
+            projectName.textContent = currentProject.name
+            todoList.innerHTML = ''
+            displayTasks()
             populateStorage()
         }
         delBtn.setAttribute('id', 'delete-project')
@@ -176,5 +209,3 @@ function displayProjects() {
         projectList.appendChild(div)
     }
 }
-
-export {displayTasks, displayProjects}
