@@ -107,6 +107,7 @@ function displayTasks() {
         const div = document.createElement('div')
         div.classList.add('todo-item')
         const input = document.createElement('input')
+        input.type = 'text'
         input.value = e.task
         input.onchange = () => {
             if (!input.value) input.value = e.task
@@ -126,9 +127,11 @@ function displayTasks() {
             if (checkbox.checked) {
                 input.classList.toggle('done')
                 e.isDone = true
+                populateStorage()
             } else {
                 input.classList.toggle('done')
                 e.isDone = false
+                populateStorage()
             } 
         }
         const input2 = document.createElement('input')
